@@ -116,12 +116,6 @@
             </div>
 
             <button id="trainBtn">Train RNN</button>
-
-            <div class="control-group">
-                <label for="predictInput">Predict next number after:</label>
-                <input type="text" id="predictInput">
-                <button id="predictBtn">Predict</button>
-            </div>
         </div>
 
         <div class="canvas-row">
@@ -187,8 +181,6 @@
         const delaySlider = document.getElementById('delaySlider');
         const delayValue = document.getElementById('delayValue');
         const trainBtn = document.getElementById('trainBtn');
-        const predictInput = document.getElementById('predictInput');
-        const predictBtn = document.getElementById('predictBtn');
         const logDiv = document.getElementById('log');
         const weightDisplay = document.getElementById('weightDisplay');
         const wInDisplay = document.getElementById('w_in_display');
@@ -272,7 +264,7 @@
 
         function drawWeightAndLossPlot(ctx, width, height, fieldLabel, weight) {
             // Add the new point to history
-            if(!allWeightAndLossHistory[fieldLabel]) {
+            if (!allWeightAndLossHistory[fieldLabel]) {
                 allWeightAndLossHistory[fieldLabel] = [];
             }
             let lossHistory = allWeightAndLossHistory[fieldLabel];
@@ -282,7 +274,7 @@
             ctx.clearRect(0, 0, width, height);
 
             // Set padding for the plot
-            const padding = 40;
+            const padding = 60;
             const plotWidth = width - 2 * padding;
             const plotHeight = height - 2 * padding;
 
@@ -292,32 +284,39 @@
             let minX = 0;
             let maxX = lossHistory.length;
 
-            for(let i=0;i<lossHistory.length;i++) {
+            for (let i = 0; i < lossHistory.length; i++) {
                 const point = lossHistory[i];
-                if(point < minY) {
-                    minY = point;
-                }
-                if(point > maxY) {
-                    maxY = point;
-                }
+                if (point < minY) minY = point;
+                if (point > maxY) maxY = point;
             }
 
-            // Add padding to min/max values to avoid points at the edges
-            const xRange = maxX - minX || 1; // Avoid division by zero
+            // Ensure we show both positive and negative values
+            const absMax = Math.max(Math.abs(minY), Math.abs(maxY));
+            minY = -absMax;
+            maxY = absMax;
+
+            // Add padding to min/max values
+            const xRange = maxX - minX || 1;
             const yRange = maxY - minY || 1;
 
             minX = Math.max(0, minX - xRange * 0.1);
             maxX = maxX + xRange * 0.1;
-            minY = Math.max(0, minY - yRange * 0.1);
+            minY = minY - yRange * 0.1;
             maxY = maxY + yRange * 0.1;
 
-            // Draw the axes
+            // Draw the axes with (0,0) at center
             ctx.beginPath();
             ctx.strokeStyle = "#000";
             ctx.lineWidth = 2;
+
+            // Y-axis (vertical)
+            const zeroY = height - padding - ((0 - minY) / (maxY - minY)) * plotHeight;
             ctx.moveTo(padding, padding);
             ctx.lineTo(padding, height - padding);
-            ctx.lineTo(width - padding, height - padding);
+
+            // X-axis (horizontal)
+            ctx.moveTo(padding, zeroY);
+            ctx.lineTo(width - padding, zeroY);
             ctx.stroke();
 
             // Draw axis labels
@@ -332,7 +331,7 @@
             ctx.save();
             ctx.translate(15, height / 2);
             ctx.rotate(-Math.PI / 2);
-            ctx.fillText("Loss", 0, 0);
+            ctx.fillText("Value", 0, 0);
             ctx.restore();
 
             // Draw scale markers and values
@@ -340,17 +339,17 @@
             ctx.textAlign = "right";
             ctx.font = "12px Arial";
 
-            // Y-axis markers
+            // Y-axis markers (positive and negative)
             for (let i = 0; i <= numMarkers; i++) {
                 const y = height - padding - (i / numMarkers) * plotHeight;
-                const lossValue = minY + (i / numMarkers) * (maxY - minY);
+                const value = minY + (i / numMarkers) * (maxY - minY);
 
                 ctx.beginPath();
                 ctx.moveTo(padding - 5, y);
                 ctx.lineTo(padding, y);
                 ctx.stroke();
 
-                ctx.fillText(lossValue.toFixed(4), padding - 8, y + 4);
+                ctx.fillText(value.toFixed(2), padding - 8, y + 4);
             }
 
             // X-axis markers
@@ -360,17 +359,17 @@
                 const weightValue = minX + (i / numMarkers) * (maxX - minX);
 
                 ctx.beginPath();
-                ctx.moveTo(x, height - padding);
-                ctx.lineTo(x, height - padding + 5);
+                ctx.moveTo(x, zeroY);
+                ctx.lineTo(x, zeroY + 5);
                 ctx.stroke();
 
-                ctx.fillText(weightValue.toFixed(2), x, height - padding + 20);
+                ctx.fillText(weightValue.toFixed(0), x, zeroY + 20);
             }
 
             // Draw all points from history
-            for(let index=0;index<lossHistory.length;index++) {
+            for (let index = 0; index < lossHistory.length; index++) {
                 const historyPoint = lossHistory[index];
-                const dotRadius = 5;
+                const dotRadius = 3;
                 const isCurrentPoint = index === lossHistory.length - 1;
 
                 // Scale the point to fit within the axes
@@ -386,7 +385,7 @@
                     ctx.shadowOffsetY = 2;
                     ctx.fillStyle = "red";
                     ctx.beginPath();
-                    ctx.arc(x, y, dotRadius + 3, 0, Math.PI * 2);
+                    ctx.arc(x, y, dotRadius + 2, 0, Math.PI * 2);
                     ctx.fill();
 
                     // Reset shadow
@@ -640,23 +639,6 @@
                 train(sequence);
             } catch (e) {
                 alert("Invalid sequence format. Please enter comma-separated numbers.");
-            }
-        });
-
-        predictBtn.addEventListener('click', () => {
-            const inputText = predictInput.value.trim();
-            if (!inputText) {
-                alert("Please enter a number to predict from");
-                return;
-            }
-
-            try {
-                const input = parseFloat(inputText);
-                h = 0; // Reset hidden state for clean prediction
-                const prediction = predictNext(input);
-                log(`Prediction after ${input}: ${prediction.toFixed(4)}`);
-            } catch (e) {
-                alert("Invalid input. Please enter a number.");
             }
         });
 
