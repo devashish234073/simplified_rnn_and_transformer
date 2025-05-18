@@ -66,6 +66,25 @@
             background-color: #f0f0f0;
             display: none;
         }
+
+        .formula-display {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            font-family: monospace;
+            white-space: pre;
+        }
+
+        .formula-line {
+            margin-bottom: 10px;
+        }
+
+        .formula-input {
+            width: 60px;
+            padding: 4px;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -109,6 +128,14 @@
         </div>
     </div>
 
+    <div id="formulaDisplay" class="formula-display">
+        <div class="formula-line">h = Math.tanh(<span id="w_in_value">0</span> * <input type="number" id="formulaInput"
+                class="formula-input" value="0" step="0.1"> + <span id="w_hid_value">0</span> * <span
+                id="h_value">0</span>)</div>
+        <div class="formula-line">Prediction = <span id="w_out_value">0</span> * <span id="h_result">0</span> = <span
+                id="prediction_result">0</span></div>
+    </div>
+
     <script>
         // DOM elements
         const canvas = document.getElementById('rnnCanvas');
@@ -149,6 +176,7 @@
         // Prediction function
         function predictNext(input) {
             h = Math.tanh(W_in * input + W_hid * h);
+            updateFormulaDisplay(input); // Update the formula display
             return W_out * h;
         }
 
@@ -233,6 +261,7 @@
             // Draw arrows
             drawArrow(inputX + inRadius, centerY, hiddenX - hidRadius, centerY);
             drawArrow(hiddenX + hidRadius, centerY, outputX - outRadius, centerY);
+            updateFormulaDisplay(parseFloat(document.getElementById('formulaInput').value) || 0);
         }
 
         // Helper function to map a value from one range to another
@@ -373,6 +402,36 @@
 
         // Initialize
         initRNN();
+
+        // Add this function to update the formula display
+        function updateFormulaDisplay(inputValue) {
+            // Update the weight values in the formula
+            document.getElementById('w_in_value').textContent = W_in.toFixed(4);
+            document.getElementById('w_hid_value').textContent = W_hid.toFixed(4);
+            document.getElementById('w_out_value').textContent = W_out.toFixed(4);
+
+            // Calculate intermediate values
+            const weightedInput = W_in * inputValue;
+            const weightedH = W_hid * h;
+            const sum = weightedInput + weightedH;
+            const newH = Math.tanh(sum);
+            const prediction = W_out * newH;
+
+            // Update the display
+            document.getElementById('h_value').textContent = h.toFixed(4);
+            document.getElementById('h_result').textContent = newH.toFixed(4);
+            document.getElementById('prediction_result').textContent = prediction.toFixed(4);
+        }
+
+        // Add event listener for the formula input
+        document.getElementById('formulaInput').addEventListener('input', function () {
+            const inputValue = parseFloat(this.value) || 0;
+            h = 0; // Reset h for demonstration purposes
+            updateFormulaDisplay(inputValue);
+        });
+
+        // Initialize the formula display
+        updateFormulaDisplay(0);
     </script>
 </body>
 
