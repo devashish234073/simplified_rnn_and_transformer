@@ -1,0 +1,107 @@
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea {
+            padding: 0.5rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            display: block;
+            width: 100%;
+            height: 100px;
+            margin-top: 1rem;
+            resize: vertical;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        ul#logUl {
+            margin-top: 1.5rem;
+            padding-left: 1rem;
+            list-style-type: disc;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        ul#logUl li {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+
+        ul#logUl li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <input type="text" id="from" value="0.1"><input type="text" id="to" value="2.8"><button
+        onclick="generateSequence()">Generate Sequence</button>
+    <br><textarea id="input"></textarea><button onclick="trainWithTransformer()">Train with Transformer</button><button onclick="trainWithRNN()">Train with RNN</button>
+    <ul id="logUl">
+
+    </ul>
+    <script src="simplest_rnn.js"></script>
+    <script src="simplest_transformer.js"></script>
+    <script>
+        let logUl = null;
+        setTimeout(() => {
+            logUl = $('#logUl');
+            log("Hello");
+        }, 1000);
+        let input = $("#input");
+        function trainWithTransformer() {
+            let data = input.value.split(",").map(Number);
+            log("data: " + data);
+            transformer().train(data);
+        }
+        function trainWithRNN() {
+            let data = input.value.split(",").map(Number);
+            log("data: " + data);
+            rnn().train(data);
+        }
+        function generateSequence() {
+            let from = parseFloat($("#from").value);
+            let to = parseFloat($("#to").value);
+            log("from: " + from);
+            log("to: " + to);
+            let sequence = [];
+            log("running generateSequence");
+            for (let i = from; i < to; i += 0.1) {
+                sequence.push(Number(i.toFixed(2)));
+            }
+            log(sequence);
+            input.value = sequence.join(",");
+        }
+    </script>
+</body>
