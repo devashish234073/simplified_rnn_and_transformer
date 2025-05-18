@@ -192,12 +192,12 @@
 
             // Radius range: 10 to 20 pixels
             const minRadius = 10;
-            const maxRadius = 20;
+            const maxRadius = 30;
 
             // Map weights (-0.1 to 0.1) to radius (10 to 20)
-            const inRadius = mapValue(W_in, -0.1, 0.1, minRadius, maxRadius);
-            const hidRadius = mapValue(W_hid, -0.1, 0.1, minRadius, maxRadius);
-            const outRadius = mapValue(W_out, -0.1, 0.1, minRadius, maxRadius);
+            const inRadius = mapValue(W_in, -3.0, 3.0, minRadius, maxRadius);
+            const hidRadius = mapValue(W_hid, -3.0, 3.0, minRadius, maxRadius);
+            const outRadius = mapValue(W_out, -3.0, 3.0, minRadius, maxRadius);
 
             // Draw connections
             ctx.beginPath();
