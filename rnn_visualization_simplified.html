@@ -8,7 +8,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -19,9 +19,19 @@
             gap: 20px;
         }
 
-        .canvas-container {
+        .canvas-row {
             display: flex;
-            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .canvas-container {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         canvas {
@@ -92,10 +102,6 @@
     <div class="container">
         <h1>RNN Weight Visualization</h1>
 
-        <div class="canvas-container">
-            <canvas id="rnnCanvas" width="600" height="300"></canvas>
-        </div>
-
         <div class="controls">
             <div class="control-group">
                 <label for="sequenceInput">Training Sequence (comma separated):</label>
@@ -115,6 +121,35 @@
                 <label for="predictInput">Predict next number after:</label>
                 <input type="text" id="predictInput">
                 <button id="predictBtn">Predict</button>
+            </div>
+        </div>
+
+        <div class="canvas-row">
+            <div class="canvas-container">
+                <h3>RNN Architecture</h3>
+                <canvas id="rnnCanvas" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="canvas-row">
+            <div class="canvas-container">
+                <h3>W_in</h3>
+                <canvas id="winCanvas" width="400" height="300"></canvas>
+            </div>
+            <div class="canvas-container">
+                <h3>W_hid</h3>
+                <canvas id="whidCanvas" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div class="canvas-row">
+            <div class="canvas-container">
+                <h3>W_out</h3>
+                <canvas id="woutCanvas" width="400" height="300"></canvas>
+            </div>
+            <div class="canvas-container">
+                <h3>loss</h3>
+                <canvas id="lossCanvas" width="400" height="300"></canvas>
             </div>
         </div>
 
@@ -140,6 +175,14 @@
         // DOM elements
         const canvas = document.getElementById('rnnCanvas');
         const ctx = canvas.getContext('2d');
+        const winCanvas = document.getElementById('winCanvas');
+        const winCtx = winCanvas.getContext('2d');
+        const whidCanvas = document.getElementById('whidCanvas');
+        const whidCtx = whidCanvas.getContext('2d');
+        const woutCanvas = document.getElementById('woutCanvas');
+        const woutCtx = woutCanvas.getContext('2d');
+        const lossCanvas = document.getElementById('lossCanvas');
+        const lossCtx = lossCanvas.getContext('2d');
         const sequenceInput = document.getElementById('sequenceInput');
         const delaySlider = document.getElementById('delaySlider');
         const delayValue = document.getElementById('delayValue');
@@ -158,6 +201,8 @@
         let trainingInterval;
         let currentIteration = 0;
         const totalIterations = 100;
+        let currentSequence = [];
+        let lossHistory = [];
 
         // Initialize RNN
         function initRNN() {
@@ -166,6 +211,7 @@
             W_out = randomBetween(-0.1, 0.1);
             h = 0;
             drawWeights();
+            drawWeightAndLossPlots(0);
         }
 
         // Random number generator
@@ -176,8 +222,215 @@
         // Prediction function
         function predictNext(input) {
             h = Math.tanh(W_in * input + W_hid * h);
-            updateFormulaDisplay(input); // Update the formula display
+            updateFormulaDisplay(input);
             return W_out * h;
+        }
+
+        // Calculate loss for given weights
+        function calculateLoss(w_in, w_hid, w_out) {
+            let totalLoss = 0;
+            let local_h = 0;
+
+            for (let i = 0; i < currentSequence.length - 1; i++) {
+                const input = currentSequence[i];
+                const target = currentSequence[i + 1];
+
+                local_h = Math.tanh(w_in * input + w_hid * local_h);
+                const prediction = w_out * local_h;
+                const error = target - prediction;
+                totalLoss += error * error;
+            }
+
+            return totalLoss;
+        }
+
+        // Draw 2D loss plots
+        function drawWeightAndLossPlots(loss) {
+            // Common parameters
+            const width = 400, height = 300;
+            const padding = 40;
+            const plotWidth = width - 2 * padding;
+            const plotHeight = height - 2 * padding;
+
+            // Range for weights (-3 to 3)
+            const weightMin = -3.0, weightMax = 3.0;
+            const samplePoints = 50;
+
+            // Draw W_in vs Loss plot
+            drawWeightAndLossPlot(winCtx, width, height, 'W_in', W_in);
+
+            // Draw W_hid vs Loss plot
+            drawWeightAndLossPlot(whidCtx, width, height, 'W_hid', W_hid);
+
+            // Draw W_out vs Loss plot
+            drawWeightAndLossPlot(woutCtx, width, height, 'W_out', W_out);
+
+            drawWeightAndLossPlot(lossCtx, width, height, 'Loss', loss);
+        }
+
+        let allWeightAndLossHistory = {};
+
+        function drawWeightAndLossPlot(ctx, width, height, fieldLabel, weight) {
+            // Add the new point to history
+            if(!allWeightAndLossHistory[fieldLabel]) {
+                allWeightAndLossHistory[fieldLabel] = [];
+            }
+            let lossHistory = allWeightAndLossHistory[fieldLabel];
+            lossHistory.push(weight);
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Set padding for the plot
+            const padding = 40;
+            const plotWidth = width - 2 * padding;
+            const plotHeight = height - 2 * padding;
+
+            // Find min and max values for scaling
+            let minY = Infinity;
+            let maxY = -Infinity;
+            let minX = 0;
+            let maxX = lossHistory.length;
+
+            for(let i=0;i<lossHistory.length;i++) {
+                const point = lossHistory[i];
+                if(point < minY) {
+                    minY = point;
+                }
+                if(point > maxY) {
+                    maxY = point;
+                }
+            }
+
+            // Add padding to min/max values to avoid points at the edges
+            const xRange = maxX - minX || 1; // Avoid division by zero
+            const yRange = maxY - minY || 1;
+
+            minX = Math.max(0, minX - xRange * 0.1);
+            maxX = maxX + xRange * 0.1;
+            minY = Math.max(0, minY - yRange * 0.1);
+            maxY = maxY + yRange * 0.1;
+
+            // Draw the axes
+            ctx.beginPath();
+            ctx.strokeStyle = "#000";
+            ctx.lineWidth = 2;
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // Draw axis labels
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "center";
+
+            // X-axis label (weight)
+            ctx.fillText(fieldLabel, width / 2, height - 10);
+
+            // Y-axis label (loss)
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText("Loss", 0, 0);
+            ctx.restore();
+
+            // Draw scale markers and values
+            const numMarkers = 5;
+            ctx.textAlign = "right";
+            ctx.font = "12px Arial";
+
+            // Y-axis markers
+            for (let i = 0; i <= numMarkers; i++) {
+                const y = height - padding - (i / numMarkers) * plotHeight;
+                const lossValue = minY + (i / numMarkers) * (maxY - minY);
+
+                ctx.beginPath();
+                ctx.moveTo(padding - 5, y);
+                ctx.lineTo(padding, y);
+                ctx.stroke();
+
+                ctx.fillText(lossValue.toFixed(4), padding - 8, y + 4);
+            }
+
+            // X-axis markers
+            ctx.textAlign = "center";
+            for (let i = 0; i <= numMarkers; i++) {
+                const x = padding + (i / numMarkers) * plotWidth;
+                const weightValue = minX + (i / numMarkers) * (maxX - minX);
+
+                ctx.beginPath();
+                ctx.moveTo(x, height - padding);
+                ctx.lineTo(x, height - padding + 5);
+                ctx.stroke();
+
+                ctx.fillText(weightValue.toFixed(2), x, height - padding + 20);
+            }
+
+            // Draw all points from history
+            for(let index=0;index<lossHistory.length;index++) {
+                const historyPoint = lossHistory[index];
+                const dotRadius = 5;
+                const isCurrentPoint = index === lossHistory.length - 1;
+
+                // Scale the point to fit within the axes
+                const x = padding + ((index - minX) / (maxX - minX)) * plotWidth;
+                const y = (height - padding) - ((historyPoint - minY) / (maxY - minY)) * plotHeight;
+
+                // Draw point
+                if (isCurrentPoint) {
+                    // Current point is larger and has shadow
+                    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+                    ctx.shadowBlur = 4;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+                    ctx.fillStyle = "red";
+                    ctx.beginPath();
+                    ctx.arc(x, y, dotRadius + 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Reset shadow
+                    ctx.shadowColor = "transparent";
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+
+                    // Add values as text next to the current dot
+                    ctx.fillStyle = "#000";
+                    ctx.textAlign = "left";
+                    ctx.fillText(
+                        `${fieldLabel}: ${historyPoint.toFixed(4)}`,
+                        x + dotRadius + 5,
+                        y
+                    );
+                } else {
+                    // Previous points are smaller and without shadow
+                    ctx.fillStyle = "blue";
+                    ctx.beginPath();
+                    ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Draw a line connecting all points
+            if (lossHistory.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(0, 0, 255, 0.5)";
+                ctx.lineWidth = 1.5;
+
+                lossHistory.forEach((historyPoint, index) => {
+                    const x = padding + ((index - minX) / (maxX - minX)) * plotWidth;
+                    const y = (height - padding) - ((historyPoint - minY) / (maxY - minY)) * plotHeight;
+
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+
+                ctx.stroke();
+            }
         }
 
         // Draw the weights as balls with connections
@@ -187,12 +440,12 @@
             // Calculate positions
             const centerY = canvas.height / 2;
             const inputX = 100;
-            const hiddenX = 300;
-            const outputX = 500;
+            const hiddenX = 200;
+            const outputX = 300;
 
             // Radius range: 10 to 20 pixels
-            const minRadius = 10;
-            const maxRadius = 30;
+            const minRadius = 5;
+            const maxRadius = 15;
 
             // Map weights (-0.1 to 0.1) to radius (10 to 20)
             const inRadius = mapValue(W_in, -3.0, 3.0, minRadius, maxRadius);
@@ -204,14 +457,14 @@
             ctx.moveTo(inputX + inRadius, centerY);
             ctx.lineTo(hiddenX - hidRadius, centerY);
             ctx.strokeStyle = '#888';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
             ctx.stroke();
 
             ctx.beginPath();
             ctx.moveTo(hiddenX + hidRadius, centerY);
             ctx.lineTo(outputX - outRadius, centerY);
             ctx.strokeStyle = '#888';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
             ctx.stroke();
 
             // Draw input weight ball
@@ -220,7 +473,7 @@
             ctx.fillStyle = '#ff6b6b';
             ctx.fill();
             ctx.strokeStyle = '#c92a2a';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
             ctx.stroke();
 
             // Draw hidden weight ball
@@ -296,6 +549,7 @@
 
         // Training function
         function train(sequence) {
+            currentSequence = sequence;
             const inputs = sequence.slice(0, -1);
             const targets = sequence.slice(1);
             const stepSize = 0.01;
@@ -337,6 +591,7 @@
                     const yA = targets[i];
                     const y = predictNext(x);
                     const difference = yA - y;
+                    const loss = difference * difference;
 
                     // Calculate how to adjust the weights
                     const adjustAmount = -2 * difference * h;
@@ -347,6 +602,15 @@
                     // Update the weights
                     W_in -= stepSize * adjustH * inputs[i];
                     W_hid -= stepSize * adjustH * h;
+                    drawWeightAndLossPlots(loss);
+
+                    // Store loss for visualization
+                    lossHistory.push({
+                        w_in: W_in,
+                        w_hid: W_hid,
+                        w_out: W_out,
+                        loss: difference * difference
+                    });
                 }
 
                 if (currentIteration % 20 === 0) {
@@ -400,9 +664,6 @@
             delayValue.textContent = delaySlider.value;
         });
 
-        // Initialize
-        initRNN();
-
         // Add this function to update the formula display
         function updateFormulaDisplay(inputValue) {
             // Update the weight values in the formula
@@ -431,6 +692,7 @@
         });
 
         // Initialize the formula display
+        initRNN();
         updateFormulaDisplay(0);
     </script>
 </body>
