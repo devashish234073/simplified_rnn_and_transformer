@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNN Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 100%;
+        }
+
+        #log {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f5f5f5;
+        }
+
+        .weight-display {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f0f0f0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>RNN Weight Visualization</h1>
+
+        <div class="canvas-container">
+            <canvas id="rnnCanvas" width="600" height="300"></canvas>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="sequenceInput">Training Sequence (comma separated):</label>
+                <input type="text" id="sequenceInput"
+                    value="0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2">
+            </div>
+
+            <div class="control-group">
+                <label for="delaySlider">Training Delay (ms):</label>
+                <input type="range" id="delaySlider" min="10" max="500" value="100">
+                <span id="delayValue">100</span>
+            </div>
+
+            <button id="trainBtn">Train RNN</button>
+
+            <div class="control-group">
+                <label for="predictInput">Predict next number after:</label>
+                <input type="text" id="predictInput">
+                <button id="predictBtn">Predict</button>
+            </div>
+        </div>
+
+        <div id="log"></div>
+
+        <div id="weightDisplay" class="weight-display">
+            <h3>Final Weights</h3>
+            <p>W_in: <span id="w_in_display"></span></p>
+            <p>W_hid: <span id="w_hid_display"></span></p>
+            <p>W_out: <span id="w_out_display"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const canvas = document.getElementById('rnnCanvas');
+        const ctx = canvas.getContext('2d');
+        const sequenceInput = document.getElementById('sequenceInput');
+        const delaySlider = document.getElementById('delaySlider');
+        const delayValue = document.getElementById('delayValue');
+        const trainBtn = document.getElementById('trainBtn');
+        const predictInput = document.getElementById('predictInput');
+        const predictBtn = document.getElementById('predictBtn');
+        const logDiv = document.getElementById('log');
+        const weightDisplay = document.getElementById('weightDisplay');
+        const wInDisplay = document.getElementById('w_in_display');
+        const wHidDisplay = document.getElementById('w_hid_display');
+        const wOutDisplay = document.getElementById('w_out_display');
+
+        // RNN variables
+        let W_in, W_hid, W_out, h;
+        let isTraining = false;
+        let trainingInterval;
+        let currentIteration = 0;
+        const totalIterations = 100;
+
+        // Initialize RNN
+        function initRNN() {
+            W_in = randomBetween(-0.1, 0.1);
+            W_hid = randomBetween(-0.1, 0.1);
+            W_out = randomBetween(-0.1, 0.1);
+            h = 0;
+            drawWeights();
+        }
+
+        // Random number generator
+        function randomBetween(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Prediction function
+        function predictNext(input) {
+            h = Math.tanh(W_in * input + W_hid * h);
+            return W_out * h;
+        }
+
+        // Draw the weights as balls with connections
+        function drawWeights() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Calculate positions
+            const centerY = canvas.height / 2;
+            const inputX = 100;
+            const hiddenX = 300;
+            const outputX = 500;
+
+            // Radius range: 10 to 20 pixels
+            const minRadius = 10;
+            const maxRadius = 20;
+
+            // Map weights (-0.1 to 0.1) to radius (10 to 20)
+            const inRadius = mapValue(W_in, -0.1, 0.1, minRadius, maxRadius);
+            const hidRadius = mapValue(W_hid, -0.1, 0.1, minRadius, maxRadius);
+            const outRadius = mapValue(W_out, -0.1, 0.1, minRadius, maxRadius);
+
+            // Draw connections
+            ctx.beginPath();
+            ctx.moveTo(inputX + inRadius, centerY);
+            ctx.lineTo(hiddenX - hidRadius, centerY);
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(hiddenX + hidRadius, centerY);
+            ctx.lineTo(outputX - outRadius, centerY);
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw input weight ball
+            ctx.beginPath();
+            ctx.arc(inputX, centerY, inRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fill();
+            ctx.strokeStyle = '#c92a2a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw hidden weight ball
+            ctx.beginPath();
+            ctx.arc(hiddenX, centerY, hidRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#4dabf7';
+            ctx.fill();
+            ctx.strokeStyle = '#1971c2';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw output weight ball
+            ctx.beginPath();
+            ctx.arc(outputX, centerY, outRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#51cf66';
+            ctx.fill();
+            ctx.strokeStyle = '#2b8a3e';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw labels
+            ctx.font = '14px Arial';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+
+            // Input label
+            ctx.fillText('W_in', inputX, centerY - inRadius - 10);
+            ctx.fillText(W_in.toFixed(4), inputX, centerY + inRadius + 20);
+
+            // Hidden label
+            ctx.fillText('W_hid', hiddenX, centerY - hidRadius - 10);
+            ctx.fillText(W_hid.toFixed(4), hiddenX, centerY + hidRadius + 20);
+
+            // Output label
+            ctx.fillText('W_out', outputX, centerY - outRadius - 10);
+            ctx.fillText(W_out.toFixed(4), outputX, centerY + outRadius + 20);
+
+            // Draw arrows
+            drawArrow(inputX + inRadius, centerY, hiddenX - hidRadius, centerY);
+            drawArrow(hiddenX + hidRadius, centerY, outputX - outRadius, centerY);
+        }
+
+        // Helper function to map a value from one range to another
+        function mapValue(value, inMin, inMax, outMin, outMax) {
+            // First clamp the value to the input range
+            const clamped = Math.max(inMin, Math.min(inMax, value));
+            // Then map it to the output range
+            return outMin + (clamped - inMin) * (outMax - outMin) / (inMax - inMin);
+        }
+
+        function drawArrow(fromX, fromY, toX, toY) {
+            const headLength = 10;
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Log messages to the log div
+        function log(message) {
+            const p = document.createElement('p');
+            p.textContent = message;
+            logDiv.appendChild(p);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // Training function
+        function train(sequence) {
+            const inputs = sequence.slice(0, -1);
+            const targets = sequence.slice(1);
+            const stepSize = 0.01;
+
+            currentIteration = 0;
+            isTraining = true;
+            trainBtn.disabled = true;
+            logDiv.innerHTML = '';
+            log("Starting training...");
+
+            trainingInterval = setInterval(() => {
+                if (currentIteration >= totalIterations) {
+                    clearInterval(trainingInterval);
+                    isTraining = false;
+                    trainBtn.disabled = false;
+                    log("Training completed!");
+
+                    // Show final weights
+                    weightDisplay.style.display = 'block';
+                    wInDisplay.textContent = W_in.toFixed(6);
+                    wHidDisplay.textContent = W_hid.toFixed(6);
+                    wOutDisplay.textContent = W_out.toFixed(6);
+
+                    // Test predictions
+                    log("\nTesting predictions:");
+                    h = 0;
+                    inputs.forEach((input, i) => {
+                        const prediction = predictNext(input);
+                        log(`Input: ${input.toFixed(2)} → Predicted: ${prediction.toFixed(4)} | Actual: ${targets[i].toFixed(2)}`);
+                        h = 0; // Reset for next prediction
+                    });
+
+                    return;
+                }
+
+                h = 0;
+                for (let i = 0; i < inputs.length; i++) {
+                    const x = inputs[i];
+                    const yA = targets[i];
+                    const y = predictNext(x);
+                    const difference = yA - y;
+
+                    // Calculate how to adjust the weights
+                    const adjustAmount = -2 * difference * h;
+                    W_out -= stepSize * adjustAmount;
+
+                    const adjustH = W_out * (1 - h ** 2) * (-2 * difference);
+
+                    // Update the weights
+                    W_in -= stepSize * adjustH * inputs[i];
+                    W_hid -= stepSize * adjustH * h;
+                }
+
+                if (currentIteration % 20 === 0) {
+                    log(`Iteration ${currentIteration}: W_in=${W_in.toFixed(4)}, W_hid=${W_hid.toFixed(4)}, W_out=${W_out.toFixed(4)}`);
+                }
+
+                currentIteration++;
+                drawWeights();
+            }, parseInt(delaySlider.value));
+        }
+
+        // Event listeners
+        trainBtn.addEventListener('click', () => {
+            const sequenceText = sequenceInput.value.trim();
+            if (!sequenceText) {
+                alert("Please enter a sequence");
+                return;
+            }
+
+            try {
+                const sequence = sequenceText.split(',').map(num => parseFloat(num.trim()));
+                if (sequence.length < 2) {
+                    alert("Sequence must have at least 2 numbers");
+                    return;
+                }
+
+                train(sequence);
+            } catch (e) {
+                alert("Invalid sequence format. Please enter comma-separated numbers.");
+            }
+        });
+
+        predictBtn.addEventListener('click', () => {
+            const inputText = predictInput.value.trim();
+            if (!inputText) {
+                alert("Please enter a number to predict from");
+                return;
+            }
+
+            try {
+                const input = parseFloat(inputText);
+                h = 0; // Reset hidden state for clean prediction
+                const prediction = predictNext(input);
+                log(`Prediction after ${input}: ${prediction.toFixed(4)}`);
+            } catch (e) {
+                alert("Invalid input. Please enter a number.");
+            }
+        });
+
+        delaySlider.addEventListener('input', () => {
+            delayValue.textContent = delaySlider.value;
+        });
+
+        // Initialize
+        initRNN();
+    </script>
+</body>
+
+</html>
