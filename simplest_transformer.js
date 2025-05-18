@@ -14,7 +14,7 @@ function transformer() {
     function getAttentionWeights(inputs) {
         const scores = [];
         for (let i = 0; i < inputs.length; i++) {
-            scores.push(inputs[i] * keyWeight);
+            scores.push(inputs[i] * keyWeight * queryWeight);
         }
         return softmax(scores); // convert to attention weights
     }
