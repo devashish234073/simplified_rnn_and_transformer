@@ -410,26 +410,6 @@
                     ctx.fill();
                 }
             }
-
-            // Draw a line connecting all points
-            if (lossHistory.length > 1) {
-                ctx.beginPath();
-                ctx.strokeStyle = "rgba(0, 0, 255, 0.5)";
-                ctx.lineWidth = 1.5;
-
-                lossHistory.forEach((historyPoint, index) => {
-                    const x = padding + ((index - minX) / (maxX - minX)) * plotWidth;
-                    const y = (height - padding) - ((historyPoint - minY) / (maxY - minY)) * plotHeight;
-
-                    if (index === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                });
-
-                ctx.stroke();
-            }
         }
 
         // Draw the weights as balls with connections
