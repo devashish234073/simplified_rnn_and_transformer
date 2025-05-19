@@ -11,7 +11,8 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            padding-top: 80px; /* Add padding to account for fixed controls */
+            padding-top: 80px;
+            /* Add padding to account for fixed controls */
         }
 
         .container {
@@ -170,6 +171,11 @@
             </div>
 
             <div class="control-group">
+                <label for="delaySlider">Use different color for each iteration</label>
+                <input type="checkbox" id="diffColorItr">
+            </div>
+
+            <div class="control-group">
                 <label for="delaySlider">Training Delay (ms):</label>
                 <input type="range" id="delaySlider" min="10" max="500" value="100">
                 <span id="delayValue">100</span>
@@ -265,7 +271,7 @@
             W_out = randomBetween(-0.1, 0.1);
             h = 0;
             drawWeights();
-            drawWeightAndLossPlots(0);
+            drawWeightAndLossPlots(0, 0);
         }
 
         // Random number generator
@@ -299,7 +305,7 @@
         }
 
         // Draw 2D loss plots
-        function drawWeightAndLossPlots(loss) {
+        function drawWeightAndLossPlots(currentIteration, loss) {
             // Common parameters
             const width = 400, height = 300;
             const padding = 40;
@@ -311,26 +317,52 @@
             const samplePoints = 50;
 
             // Draw W_in vs Loss plot
-            drawWeightAndLossPlot(winCtx, width, height, 'W_in', W_in);
+            drawWeightAndLossPlot(winCtx, currentIteration, width, height, 'W_in', W_in);
 
             // Draw W_hid vs Loss plot
-            drawWeightAndLossPlot(whidCtx, width, height, 'W_hid', W_hid);
+            drawWeightAndLossPlot(whidCtx, currentIteration, width, height, 'W_hid', W_hid);
 
             // Draw W_out vs Loss plot
-            drawWeightAndLossPlot(woutCtx, width, height, 'W_out', W_out);
+            drawWeightAndLossPlot(woutCtx, currentIteration, width, height, 'W_out', W_out);
 
-            drawWeightAndLossPlot(lossCtx, width, height, 'Loss', loss);
+            drawWeightAndLossPlot(lossCtx, currentIteration, width, height, 'Loss', loss);
         }
 
         let allWeightAndLossHistory = {};
 
-        function drawWeightAndLossPlot(ctx, width, height, fieldLabel, weight) {
+        function getRandomDarkColor() {
+            const darkColors = [
+                'blue', 'cyan', 'darkgoldenrod', 'gray', 'green',
+                'magenta', 'darkviolet', 'midnightblue', 'navy', 'rebeccapurple'
+            ];
+
+            return darkColors[Math.floor(Math.random() * darkColors.length)];
+        }
+
+        let iterationColor = [];
+
+        function drawWeightAndLossPlot(ctx, currentIteration, width, height, fieldLabel, weight) {
+            if(iterationColor.length == currentIteration) {
+                if(document.getElementById('diffColorItr').checked) {
+                    iterationColor.push(getRandomDarkColor());
+                } else {
+                    iterationColor.push("blue");
+                }
+            }
             // Add the new point to history
             if (!allWeightAndLossHistory[fieldLabel]) {
-                allWeightAndLossHistory[fieldLabel] = [];
+                allWeightAndLossHistory[fieldLabel] = {};
             }
             let lossHistory = allWeightAndLossHistory[fieldLabel];
-            lossHistory.push(weight);
+            if (!lossHistory[currentIteration]) {
+                lossHistory[currentIteration] = [];
+            }
+            lossHistory[currentIteration].push(weight);
+
+            let totalHistories = 0;
+            for (let itr in lossHistory) {
+                totalHistories += lossHistory[itr].length;
+            }
 
             // Clear the canvas
             ctx.clearRect(0, 0, width, height);
@@ -344,12 +376,14 @@
             let minY = Infinity;
             let maxY = -Infinity;
             let minX = 0;
-            let maxX = lossHistory.length;
+            let maxX = totalHistories;
 
-            for (let i = 0; i < lossHistory.length; i++) {
-                const point = lossHistory[i];
-                if (point < minY) minY = point;
-                if (point > maxY) maxY = point;
+            for (let itr in lossHistory) {
+                for (let i = 0; i < lossHistory[itr].length; i++) {
+                    const point = lossHistory[itr][i];
+                    if (point < minY) minY = point;
+                    if (point > maxY) maxY = point;
+                }
             }
 
             // Ensure we show both positive and negative values
@@ -428,11 +462,20 @@
                 ctx.fillText(weightValue.toFixed(0), x, zeroY + 20);
             }
 
+            let lossHistoryCombined = [];
+            let pointColors = [];
+            for (let itr in lossHistory) {
+                for (let index = 0; index < lossHistory[itr].length; index++) {
+                    lossHistoryCombined.push(lossHistory[itr][index]);
+                    pointColors.push(iterationColor[itr]);
+                }
+            }
+
             // Draw all points from history
-            for (let index = 0; index < lossHistory.length; index++) {
-                const historyPoint = lossHistory[index];
+            for (let index = 0; index < lossHistoryCombined.length; index++) {
+                const historyPoint = lossHistoryCombined[index];
                 const dotRadius = 0.5;
-                const isCurrentPoint = index === lossHistory.length - 1;
+                const isCurrentPoint = index === lossHistoryCombined.length - 1;
 
                 // Scale the point to fit within the axes
                 const x = padding + ((index - minX) / (maxX - minX)) * plotWidth;
@@ -466,7 +509,7 @@
                     );
                 } else {
                     // Previous points are smaller and without shadow
-                    ctx.fillStyle = "blue";
+                    ctx.fillStyle = pointColors[index];//"blue";
                     ctx.beginPath();
                     ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
                     ctx.fill();
@@ -643,7 +686,7 @@
                     // Update the weights
                     W_in -= stepSize * adjustH * inputs[i];
                     W_hid -= stepSize * adjustH * h;
-                    drawWeightAndLossPlots(loss);
+                    drawWeightAndLossPlots(currentIteration, loss);
 
                     // Store loss for visualization
                     lossHistory.push({
