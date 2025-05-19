@@ -67,12 +67,13 @@
 
     <input type="text" id="from" value="0.1"><input type="text" id="to" value="2.8"><button
         onclick="generateSequence()">Generate Sequence</button>
-    <br><textarea id="input"></textarea><button onclick="trainWithTransformer()">Train with Transformer</button><button onclick="trainWithRNN()">Train with RNN</button>
+    <br><textarea id="input"></textarea><button onclick="trainWithTransformer()">Train with Transformer</button><button onclick="trainWithVectoredTransformer()">Train with Vectored Transformer</button><button onclick="trainWithRNN()">Train with RNN</button>
     <ul id="logUl">
 
     </ul>
     <script src="simplest_rnn.js"></script>
     <script src="simplest_transformer.js"></script>
+    <script src="vectored_transformer.js"></script>
     <script>
         let logUl = null;
         setTimeout(() => {
@@ -84,6 +85,11 @@
             let data = input.value.split(",").map(Number);
             log("data: " + data);
             transformer().train(data);
+        }
+        function trainWithVectoredTransformer() {
+            let data = input.value.split(",").map(Number);
+            log("data: " + data);
+            vectoredTransformer().train(data);
         }
         function trainWithRNN() {
             let data = input.value.split(",").map(Number);
