@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,21 +15,21 @@
             color: #333;
             line-height: 1.6;
         }
-        
+
         .container {
             background: white;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             margin-bottom: 25px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        
+
         .container:hover {
-            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
             transform: translateY(-2px);
         }
-        
+
         .token-input-section {
             display: flex;
             gap: 20px;
@@ -36,7 +37,7 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         .token-box {
             display: flex;
             flex-direction: column;
@@ -47,15 +48,15 @@
             background: linear-gradient(to bottom, #f9f9f9, #eef2f8);
             min-width: 140px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-        
+
         .token-box:hover {
             border-color: #3a5a8a;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transform: translateY(-3px);
         }
-        
+
         .token-input {
             padding: 10px;
             border: 1px solid #ccc;
@@ -67,13 +68,13 @@
             box-sizing: border-box;
             transition: border-color 0.3s;
         }
-        
+
         .token-input:focus {
             outline: none;
             border-color: #4a6fa5;
             box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
         }
-        
+
         .token-id {
             background: #e0e7f3;
             padding: 6px 12px;
@@ -87,7 +88,7 @@
             color: #3a5a8a;
             font-weight: 500;
         }
-        
+
         .matrices-section {
             display: flex;
             gap: 30px;
@@ -95,7 +96,7 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         .matrix-group {
             display: flex;
             flex-direction: column;
@@ -105,25 +106,30 @@
             padding: 15px;
             background: #fafafa;
         }
-        
+
         .matrix-label {
             font-weight: bold;
             margin-bottom: 10px;
             font-size: 16px;
             color: #444;
         }
-        
+
         .vector-display {
             display: flex;
             flex-direction: column;
             gap: 5px;
         }
-        
+
         .vector-row {
             display: flex;
             gap: 5px;
         }
-        
+
+        .vector-cell-container {
+            display: flex;
+            gap: 1px;
+        }
+
         .vector-cell {
             width: 50px;
             height: 30px;
@@ -136,12 +142,12 @@
             font-size: 12px;
             font-weight: bold;
         }
-        
+
         .table-section {
             margin-bottom: 30px;
             overflow-x: auto;
         }
-        
+
         .table-label {
             font-size: 18px;
             font-weight: bold;
@@ -153,16 +159,16 @@
             border-radius: 6px;
             border-left: 4px solid #4a6fa5;
         }
-        
+
         .calculation-table {
             border-collapse: collapse;
             margin: 0 auto;
             background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             border-radius: 8px;
             overflow: hidden;
         }
-        
+
         .calculation-table th,
         .calculation-table td {
             border: 1px solid #ddd;
@@ -171,51 +177,51 @@
             min-width: 80px;
             font-weight: bold;
         }
-        
+
         .calculation-table th {
             background: #4a6fa5;
             color: white;
             font-weight: 600;
         }
-        
+
         .calculation-table td {
             background: #f9f9f9;
         }
-        
+
         .calculation-table tr:nth-child(even) td {
             background: #f0f4f9;
         }
-        
+
         .calculation-table tr:hover td {
             background: #e6edf7;
         }
-        
+
         .value-usage-section {
             margin-top: 30px;
         }
-        
+
         .attention-output {
             display: flex;
             justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
         }
-        
+
         .output-vector {
             border: 2px solid #4a6fa5;
             border-radius: 8px;
             padding: 15px;
             background: linear-gradient(to bottom, #f0f8ff, #e6f0ff);
             min-width: 200px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
             transition: transform 0.2s;
         }
-        
+
         .output-vector:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .section-title {
             font-size: 22px;
             font-weight: 600;
@@ -225,7 +231,7 @@
             padding-bottom: 10px;
             position: relative;
         }
-        
+
         .section-title:after {
             content: '';
             position: absolute;
@@ -237,7 +243,7 @@
             background: linear-gradient(to right, #4a6fa5, #6a8fc5, #4a6fa5);
             border-radius: 3px;
         }
-        
+
         h1 {
             text-align: center;
             color: #2c3e50;
@@ -246,7 +252,7 @@
             position: relative;
             padding-bottom: 15px;
         }
-        
+
         h1:after {
             content: '';
             position: absolute;
@@ -258,7 +264,7 @@
             background: linear-gradient(to right, #4a6fa5, #6a8fc5, #4a6fa5);
             border-radius: 4px;
         }
-        
+
         .vector-header {
             font-size: 10px;
             background: #e0e7f3;
@@ -269,7 +275,7 @@
             color: #3a5a8a;
             font-weight: 500;
         }
-        
+
         .calculation-details {
             font-size: 11px;
             color: #555;
@@ -279,7 +285,7 @@
             border-radius: 4px;
             border-left: 3px solid #b8c7e0;
         }
-        
+
         .vector-label {
             font-weight: bold;
             margin-bottom: 8px;
@@ -289,7 +295,7 @@
             justify-content: center;
             gap: 5px;
         }
-        
+
         .vector-label:before {
             content: '';
             display: block;
@@ -300,131 +306,180 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Transformer Attention Mechanism</h1>
-        
+
         <div class="section-title">Token Input with Q, K, V Vectors</div>
         <div class="token-input-section">
             <div class="token-box">
                 <div style="font-weight: bold; margin-bottom: 5px; color: #3a5a8a;">TOKEN1</div>
                 <input type="text" class="token-input" id="token1" placeholder="Enter word">
                 <div class="token-id" id="tokenId1">Token ID: -</div>
-                
+
                 <!-- Q, K, V vectors for Token 1 -->
                 <div style="margin-top: 15px; display: flex; gap: 10px;">
                     <div style="text-align: center;">
                         <div class="vector-label">Q</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="q1_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="q1_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="q1_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="q1_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">K</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="k1_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="k1_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="k1_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="k1_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">V</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="v1_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="v1_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="v1_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="v1_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="token-box">
                 <div style="font-weight: bold; margin-bottom: 5px; color: #3a5a8a;">TOKEN2</div>
                 <input type="text" class="token-input" id="token2" placeholder="Enter word">
                 <div class="token-id" id="tokenId2">Token ID: -</div>
-                
+
                 <!-- Q, K, V vectors for Token 2 -->
                 <div style="margin-top: 15px; display: flex; gap: 10px;">
                     <div style="text-align: center;">
                         <div class="vector-label">Q</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="q2_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="q2_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="q2_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="q2_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">K</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="k2_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="k2_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="k2_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="k2_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">V</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="v2_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="v2_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="v2_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="v2_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="token-box">
                 <div style="font-weight: bold; margin-bottom: 5px; color: #3a5a8a;">TOKEN3</div>
                 <input type="text" class="token-input" id="token3" placeholder="Enter word">
                 <div class="token-id" id="tokenId3">Token ID: -</div>
-                
+
                 <!-- Q, K, V vectors for Token 3 -->
                 <div style="margin-top: 15px; display: flex; gap: 10px;">
                     <div style="text-align: center;">
                         <div class="vector-label">Q</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="q3_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="q3_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="q3_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="q3_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">K</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="k3_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="k3_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="k3_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="k3_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">V</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="v3_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="v3_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="v3_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="v3_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="token-box">
                 <div style="font-weight: bold; margin-bottom: 5px; color: #3a5a8a;">TOKEN4</div>
                 <input type="text" class="token-input" id="token4" placeholder="Enter word">
                 <div class="token-id" id="tokenId4">Token ID: -</div>
-                
+
                 <!-- Q, K, V vectors for Token 4 -->
                 <div style="margin-top: 15px; display: flex; gap: 10px;">
                     <div style="text-align: center;">
                         <div class="vector-label">Q</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="q4_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="q4_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="q4_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="q4_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">K</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="k4_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="k4_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="k4_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="k4_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                     <div style="text-align: center;">
                         <div class="vector-label">V</div>
                         <div style="border: 1px solid #b8c7e0; padding: 5px; background: white; border-radius: 6px;">
-                            <div class="vector-cell" id="v4_0" style="width: 40px; height: 25px; font-size: 10px;">0</div>
-                            <div class="vector-cell" id="v4_1" style="width: 40px; height: 25px; font-size: 10px;">0</div>
+                            <div class="vector-cell-container">
+                            <div class="vector-cell" id="v4_0" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            <div class="vector-cell" id="v4_1" style="width: 40px; height: 25px; font-size: 10px;">0
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -614,24 +669,24 @@
         function updateTokenVectors(queries, keys, values) {
             for (let i = 0; i < 4; i++) {
                 // Update Q vectors
-                document.getElementById(`q${i+1}_0`).textContent = queries[i][0];
-                document.getElementById(`q${i+1}_1`).textContent = queries[i][1];
-                
+                document.getElementById(`q${i + 1}_0`).textContent = queries[i][0];
+                document.getElementById(`q${i + 1}_1`).textContent = queries[i][1];
+
                 // Update K vectors
-                document.getElementById(`k${i+1}_0`).textContent = keys[i][0];
-                document.getElementById(`k${i+1}_1`).textContent = keys[i][1];
-                
+                document.getElementById(`k${i + 1}_0`).textContent = keys[i][0];
+                document.getElementById(`k${i + 1}_1`).textContent = keys[i][1];
+
                 // Update V vectors
-                document.getElementById(`v${i+1}_0`).textContent = values[i][0];
-                document.getElementById(`v${i+1}_1`).textContent = values[i][1];
-                
+                document.getElementById(`v${i + 1}_0`).textContent = values[i][0];
+                document.getElementById(`v${i + 1}_1`).textContent = values[i][1];
+
                 // Update table header Q vectors
-                document.getElementById(`header_q${i+1}_0`).textContent = queries[i][0];
-                document.getElementById(`header_q${i+1}_1`).textContent = queries[i][1];
-                
+                document.getElementById(`header_q${i + 1}_0`).textContent = queries[i][0];
+                document.getElementById(`header_q${i + 1}_1`).textContent = queries[i][1];
+
                 // Update table header K vectors
-                document.getElementById(`header_k${i+1}_0`).textContent = keys[i][0];
-                document.getElementById(`header_k${i+1}_1`).textContent = keys[i][1];
+                document.getElementById(`header_k${i + 1}_0`).textContent = keys[i][0];
+                document.getElementById(`header_k${i + 1}_1`).textContent = keys[i][1];
             }
         }
 
@@ -643,11 +698,11 @@
             for (let i = 0; i < 4; i++) {
                 const output = [0, 0];
                 let calculationDetails = [];
-                
+
                 for (let j = 0; j < 4; j++) {
                     output[0] += attentionScores[i][j] * values[j][0];
                     output[1] += attentionScores[i][j] * values[j][1];
-                    
+
                     // Add calculation details for each multiplication
                     calculationDetails.push(
                         `(${attentionScores[i][j].toFixed(3)} × [${values[j][0]}, ${values[j][1]}])`
@@ -689,16 +744,16 @@
                 const tokenId = tokenize(token);
                 tokens.push(token);
                 tokenIds.push(tokenId);
-                
+
                 // Update token ID display
-                document.getElementById(`tokenId${i}`).textContent = 
+                document.getElementById(`tokenId${i}`).textContent =
                     tokenId !== null ? `Token ID: ${tokenId}` : 'Token ID: -';
 
                 // Generate Q, K, V vectors
                 const qVec = generateVector(tokenId);
                 const kVec = generateVector(tokenId ? tokenId + 1000 : null);
                 const vVec = generateVector(tokenId ? tokenId + 2000 : null);
-                
+
                 queries.push(qVec);
                 keys.push(kVec);
                 values.push(vVec);
@@ -714,7 +769,7 @@
                 for (let j = 0; j < 4; j++) {
                     const dot = dotProduct(queries[i], keys[j]);
                     row.push(dot);
-                    document.getElementById(`dot_${i+1}_${j+1}`).textContent = dot.toFixed(2);
+                    document.getElementById(`dot_${i + 1}_${j + 1}`).textContent = dot.toFixed(2);
                 }
                 dotProducts.push(row);
             }
@@ -725,7 +780,7 @@
                 const softmaxRow = softmax(dotProducts[i]);
                 attentionScores.push(softmaxRow);
                 for (let j = 0; j < 4; j++) {
-                    document.getElementById(`soft_${i+1}_${j+1}`).textContent = softmaxRow[j].toFixed(3);
+                    document.getElementById(`soft_${i + 1}_${j + 1}`).textContent = softmaxRow[j].toFixed(3);
                 }
             }
 
@@ -742,4 +797,5 @@
         updateAll();
     </script>
 </body>
+
 </html>
